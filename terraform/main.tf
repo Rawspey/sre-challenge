@@ -1,27 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "5.40.0"
-    }
-  }
-}
-provider "aws" {
-    region = "us-west-2"
-    profile = "639035123345_PowerUserAccess"
-}
-
-terraform {
-  backend "s3" {
-    bucket = "eea-sre-challenge"
-    key    = "terraform_state"
-    region = "us-west-2"
-    encrypt = true
-    profile = "639035123345_PowerUserAccess"
-    sts_region = "eu-west-1"
-  }
-}
-
 module "payments_workers" {
     source     = "./workers"
     name       = "payments_workers"
@@ -102,25 +78,6 @@ resource "aws_codedeploy_deployment_group" "workers-deployment_grp" {
 
 ## Application servers
 
-variable "elb_name" {
-    type    = string
-    default = "sre-application-alb"    
-}
-
-variable "vpc_id" {
-    type    = string
-    default = "vpc-0792372e93a253e53"    
-}
-
-variable "public_subnet_ids" {
-    type = list(string)
-    default = ["subnet-0c80a127103c7f99e", "subnet-08c1c9049e6629ec4"]
-}
-
-variable "sns_topic" {
-    type    = string
-    default = "arn:aws:sns:us-west-2:639035123345:Admins"
-}
 
 module "application" {
     source     = "./application"
@@ -256,10 +213,4 @@ resource "aws_codedeploy_deployment_group" "application-deployment-grp" {
                             ]
 }
 
-output "alb_security_group_id" {
-  value = aws_security_group.alb_security_group.id
-}
 
-output "target_group_arn" {
-  value = aws_lb_target_group.application.arn
-}
